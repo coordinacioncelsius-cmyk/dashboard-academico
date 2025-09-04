@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Académico - Sistema de Gestión Completo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: block;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .dynamic-field {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: #f9fafb;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 15px 0 10px 0;
+            font-weight: bold;
+        }
+        .counter-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item {
+            cursor: pointer;
+            padding: 12px 20px;
+            margin: 5px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+        .sidebar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 250px;
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .course-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .btn-success {
+            background: #22c55e;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e5e7eb;
+            border: 1px solid #e5e7eb;
+        }
+        .calendar-day {
+            background: white;
+            padding: 8px;
+            min-height: 80px;
+            position: relative;
+        }
+        .calendar-event {
+            background: #667eea;
+            color: white;
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin: 1px 0;
+            cursor: pointer;
+        }
+        .page-section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+         {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .modal {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-6">
+            <h2 class="text-xl font-bold mb-2">
+                <i class="fas fa-graduation-cap"></i>
+                Dashboard Académico
+            </h2>
+            <p class="text-sm opacity-75">Sistema de Gestión Integral</p>
+        </div>
+        
+        <nav class="px-4">
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <i class="fas fa-tachometer-alt w-5"></i>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="showSection('courses')">
+                <i class="fas fa-book w-5"></i>
+                Gestión de Cursos
+            </div>
+            <div class="nav-item" onclick="showSection('professors')">
+                <i class="fas fa-chalkboard-teacher w-5"></i>
+                Gestión de Profesores
+            </div>
+            <div class="nav-item" onclick="showSection('students')">
+                <i class="fas fa-user-graduate w-5"></i>
+                Gestión de Alumnos
+            </div>
+            <div class="nav-item" onclick="showSection('calendar')">
+                <i class="fas fa-calendar w-5"></i>
+                Calendario
+            </div>
+            <div class="nav-item" onclick="showSection('reports')">
+                <i class="fas fa-chart-bar w-5"></i>
+                Reportes
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="page-section">
+            <h1 class="text-3xl font-bold mb-6">Dashboard Principal</h1>
+            
+            <!-- Counters Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <div class="counter-card">
+                    <div class="text-3xl font-bold mb-2" id="total-active-students">0</div>
+                    <div class="text-sm">Alumnos Activos</div>
+                </div>
+                <div class="counter-card">
+                    <div class="text-3xl font-bold mb-2" id="total-dropout-students">0</div>
+                    <div class="text-sm">Alumnos con Baja</div>
+                </div>
+                <div class="counter-card">
+                    <div class="text-3xl font-bold mb-2" id="total-inscriptions">0</div>
+                    <div class="text-sm">Total Inscripciones</div>
+                </div>
+                <div class="counter-card">
+                    <div class="text-3xl font-bold mb-2" id="active-courses">0</div>
+                    <div class="text-sm">Cursos Activos</div>
+                </div>
+                <div class="counter-card">
+                    <div class="text-3xl font-bold mb-2" id="upcoming-exams">0</div>
+                    <div class="text-sm">Próximos Exámenes</div>
+                </div>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <h3 class="text-lg font-semibold mb-4">
+                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                    Alertas Pendientes
+                </h3>
+                <div id="alerts-container">
+                    <!-- Alerts will be dynamically generated -->
+                </div>
+            </div>
+
+            <!-- Quick Stats Chart -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Estadísticas Rápidas</h3>
+                <div style="height: 300px;">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Section -->
+        <div id="courses-section" class="page-section" style="display: none;">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">Gestión de Cursos</h1>
+                <button onclick="openCourseModal()" class="btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo Curso
+                </button>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="grid-2">
+                    <input type="text" id="course-search" placeholder="Buscar cursos..." class="form-input" onkeyup="filterCourses()">
+                    <select id="professor-filter" class="form-input" onchange="filterCourses()">
+                        <option value="">Todos los profesores</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Courses List -->
+            <div id="courses-list">
+                <!-- Courses will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Professors Section -->
+        <div id="professors-section" class="page-section" style="display: none;">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">Gestión de Profesores</h1>
+                <button onclick="openProfessorModal()" class="btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo Profesor
+                </button>
+            </div>
+
+            <!-- Professors List -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-3">Nombre</th>
+                                    <th class="text-left py-3">Especialidad</th>
+                                    <th class="text-left py-3">Email</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="professors-list">
+                                <!-- Professors will be dynamically generated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div id="students-section" class="page-section" style="display: none;">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">Gestión de Alumnos</h1>
+                <button onclick="openStudentModal()" class="btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo Alumno
+                </button>
+            </div>
+
+            <!-- Students List -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-3">Nombre</th>
+                                    <th class="text-left py-3">DNI</th>
+                                    <th class="text-left py-3">Email</th>
+                                    <th class="text-left py-3">Curso</th>
+                                    <th class="text-left py-3">Estado</th>
+                                    <th class="text-left py-3">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-list">
+                                <!-- Students will be dynamically generated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div id="calendar-section" class="page-section" style="display: none;">
+            <h1 class="text-3xl font-bold mb-6">Calendario Académico</h1>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="changeMonth(-1)" class="btn-secondary">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </button>
+                    <h3 id="calendar-title" class="text-xl font-semibold"></h3>
+                    <button onclick="changeMonth(1)" class="btn-secondary">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- Calendar will be dynamically generated -->
+                </div>
+                
+                <div class="mt-4 flex flex-wrap gap-4">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                        <span class="text-sm">Exámenes Parciales</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                        <span class="text-sm">Exámenes Finales</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
+                        <span class="text-sm">Hitos de Aprendizaje</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports-section" class="page-section" style="display: none;">
+            <h1 class="text-3xl font-bold mb-6">Reportes</h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Rendimiento por Curso</h3>
+                    <div style="height: 300px;">
+                        <canvas id="coursePerformanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Evolución de Inscripciones</h3>
+                    <div style="height: 300px;">
+                        <canvas id="enrollmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Modal -->
+    <div id="course-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="course-modal-title">Nuevo Curso</h2>
+                <button onclick="closeCourseModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="course-form">
+                <input type="hidden" id="course-id">
+                
+                <!-- Basic Information -->
+                <div class="section-header">
+                    <i class="fas fa-info-circle"></i> Información Básica
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Curso *</label>
+                        <input type="text" id="course-name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Código</label>
+                        <input type="text" id="course-code" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <textarea id="course-description" class="form-input" rows="3"></textarea>
+                </div>
+                
+                <!-- Dates and Schedule -->
+                <div class="section-header">
+                    <i class="fas fa-calendar"></i> Fechas y Horarios
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Inicio *</label>
+                        <input type="date" id="course-start-date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Finalización *</label>
+                        <input type="date" id="course-end-date" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Días de la Semana</label>
+                        <select id="course-days" class="form-input">
+                            <option value="LUNES">Lunes</option>
+                            <option value="MARTES">Martes</option>
+                            <option value="MIERCOLES">Miércoles</option>
+                            <option value="JUEVES">Jueves</option>
+                            <option value="VIERNES">Viernes</option>
+                            <option value="SABADO">Sábado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Horario</label>
+                        <select id="course-schedule" class="form-input">
+                            <option value="9-11">9:00 - 11:00</option>
+                            <option value="11-13">11:00 - 13:00</option>
+                            <option value="18-20">18:00 - 20:00</option>
+                            <option value="20-22">20:00 - 22:00</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Professor Assignment -->
+                <div class="section-header">
+                    <i class="fas fa-user-tie"></i> Asignación de Profesor
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Profesor</label>
+                    <select id="course-professor" class="form-input">
+                        <option value="">Seleccionar profesor</option>
+                    </select>
+                </div>
+                
+                <!-- Partial Exams -->
+                <div class="section-header">
+                    <i class="fas fa-clipboard-check"></i> Exámenes Parciales
+                </div>
+                
+                <div id="partial-exams-container">
+                    <!-- Dynamic partial exams will be added here -->
+                </div>
+                <button type="button" onclick="addPartialExam()" class="btn-secondary mt-2">
+                    <i class="fas fa-plus"></i> Agregar Parcial
+                </button>
+                
+                <!-- Final Exams -->
+                <div class="section-header">
+                    <i class="fas fa-graduation-cap"></i> Exámenes Finales
+                </div>
+                
+                <div id="final-exams-container">
+                    <!-- Dynamic final exams will be added here -->
+                </div>
+                <button type="button" onclick="addFinalExam()" class="btn-secondary mt-2">
+                    <i class="fas fa-plus"></i> Agregar Final
+                </button>
+                
+                <!-- Learning Milestones -->
+                <div class="section-header">
+                    <i class="fas fa-flag-checkered"></i> Hitos de Aprendizaje
+                </div>
+                
+                <div id="milestones-container">
+                    <!-- Dynamic milestones will be added here -->
+                </div>
+                <button type="button" onclick="addMilestone()" class="btn-secondary mt-2">
+                    <i class="fas fa-plus"></i> Agregar Hito
+                </button>
+                
+                <!-- Student Management -->
+                <div class="section-header">
+                    <i class="fas fa-users"></i> Gestión de Estudiantes
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="form-group">
+                        <label class="form-label">Estudiantes Iniciales</label>
+                        <input type="number" id="course-initial-students" class="form-input" min="0" onchange="calculateActiveStudents()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estudiantes Bajas</label>
+                        <input type="number" id="course-dropout-students" class="form-input" min="0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estudiantes Activos</label>
+                        <input type="number" id="course-active-students" class="form-input" min="0" readonly>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <button type="button" onclick="openDropoutModal()" class="btn-secondary">
+                        <i class="fas fa-user-minus"></i> Agregar Baja
+                    </button>
+                    <button type="button" onclick="showStudentsList()" class="btn-secondary ml-2">
+                        <i class="fas fa-list"></i> Ver Lista de Estudiantes
+                    </button>
+                </div>
+                
+                <div id="students-dropouts-list" class="mt-4">
+                    <!-- Dropouts list will be shown here -->
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeCourseModal()" class="btn-secondary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar Curso
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Professor Modal -->
+    <div id="professor-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="professor-modal-title">Nuevo Profesor</h2>
+                <button onclick="closeProfessorModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="professor-form">
+                <input type="hidden" id="professor-id">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" id="professor-name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Apellido *</label>
+                        <input type="text" id="professor-lastname" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" id="professor-email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" id="professor-phone" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Especialidad *</label>
+                        <input type="text" id="professor-specialty" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select id="professor-status" class="form-input">
+                            <option value="active">Activo</option>
+                            <option value="inactive">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fecha de Ingreso</label>
+                    <input type="date" id="professor-start-date" class="form-input">
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeProfessorModal()" class="btn-secondary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar Profesor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div id="student-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="student-modal-title">Nuevo Alumno</h2>
+                <button onclick="closeStudentModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="student-form">
+                <input type="hidden" id="student-id">
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" id="student-name" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Apellido *</label>
+                        <input type="text" id="student-lastname" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">DNI *</label>
+                        <input type="text" id="student-dni" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="student-email" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" id="student-phone" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Curso</label>
+                        <select id="student-course" class="form-input">
+                            <option value="">Seleccionar curso</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select id="student-status" class="form-input">
+                            <option value="active">Activo</option>
+                            <option value="dropout">Baja</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Inscripción</label>
+                        <input type="date" id="student-enrollment-date" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeStudentModal()" class="btn-secondary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar Alumno
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dropout Modal -->
+    <div id="dropout-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Registrar Baja de Estudiante</h2>
+                <button onclick="closeDropoutModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="dropout-form">
+                <div class="form-group">
+                    <label class="form-label">Nombre del Estudiante *</label>
+                    <input type="text" id="dropout-student-name" class="form-input" required>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Baja *</label>
+                        <input type="date" id="dropout-date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Motivo</label>
+                        <select id="dropout-reason" class="form-input">
+                            <option value="personal">Motivos personales</option>
+                            <option value="economic">Motivos económicos</option>
+                            <option value="academic">Rendimiento académico</option>
+                            <option value="schedule">Incompatibilidad horaria</option>
+                            <option value="other">Otros</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Observaciones</label>
+                    <textarea id="dropout-observations" class="form-input" rows="3"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeDropoutModal()" class="btn-secondary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Registrar Baja
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let courses = [];
+        let professors = [];
+        let students = [];
+        let currentDate = new Date();
+        let currentEditingCourse = null;
+        let currentEditingProfessor = null;
+        let currentEditingStudent = null;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loaded, initializing...');
+            loadData();
+            initializeApp();
+            updateDashboard();
+            initializeCharts();
+            renderCalendar();
+        });
+
+        // Load data from localStorage
+        function loadData() {
+            console.log('Loading data from localStorage...');
+            try {
+                courses = JSON.parse(localStorage.getItem('academicCourses') || '[]');
+                professors = JSON.parse(localStorage.getItem('academicProfessors') || '[]');
+                students = JSON.parse(localStorage.getItem('academicStudents') || '[]');
+                console.log('Data loaded:', { courses: courses.length, professors: professors.length, students: students.length });
+            } catch (error) {
+                console.error('Error loading data:', error);
+                courses = [];
+                professors = [];
+                students = [];
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            console.log('Saving data to localStorage...');
+            try {
+                localStorage.setItem('academicCourses', JSON.stringify(courses));
+                localStorage.setItem('academicProfessors', JSON.stringify(professors));
+                localStorage.setItem('academicStudents', JSON.stringify(students));
+                console.log('Data saved successfully');
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('Error al guardar los datos');
+            }
+        }
+
+        // Initialize app
+        function initializeApp() {
+            console.log('Initializing app components...');
+            renderCourses();
+            renderProfessors();
+            renderStudents();
+            populateProfessorsSelect();
+            populateCoursesSelect();
+            
+            // Set default date for professor start date
+            document.getElementById('professor-start-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('student-enrollment-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('dropout-date').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Show/hide sections
+        function showSection(sectionName) {
+            console.log('Showing section:', sectionName);
+            
+            // Hide all sections
+            const sections = ['dashboard', 'courses', 'professors', 'students', 'calendar', 'reports'];
+            sections.forEach(section => {
+                const element = document.getElementById(section + '-section');
+                if (element) {
+                    element.style.display = 'none';
+                }
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update specific sections
+            if (sectionName === 'dashboard') {
+                updateDashboard();
+            } else if (sectionName === 'calendar') {
+                renderCalendar();
+            } else if (sectionName === 'reports') {
+                updateReportsCharts();
+            }
+        }
+
+        // Update dashboard counters
+        function updateDashboard() {
+            console.log('Updating dashboard...');
+            const activeCourses = getActiveCourses();
+            
+            let totalActiveStudents = 0;
+            let totalDropoutStudents = 0;
+            let totalInscriptions = 0;
+            
+            activeCourses.forEach(course => {
+                const initialStudents = parseInt(course.initialStudents) || 0;
+                const dropouts = course.dropouts ? course.dropouts.length : 0;
+                
+                totalInscriptions += initialStudents;
+                totalDropoutStudents += dropouts;
+                totalActiveStudents += (initialStudents - dropouts);
+            });
+            
+            const upcomingExams = getUpcomingExams();
+            
+            // Update counters
+            document.getElementById('total-active-students').textContent = totalActiveStudents;
+            document.getElementById('total-dropout-students').textContent = totalDropoutStudents;
+            document.getElementById('total-inscriptions').textContent = totalInscriptions;
+            document.getElementById('active-courses').textContent = activeCourses.length;
+            document.getElementById('upcoming-exams').textContent = upcomingExams.length;
+            
+            // Update alerts
+            updateAlerts(upcomingExams);
+            
+            console.log('Dashboard updated:', {
+                activeStudents: totalActiveStudents,
+                dropoutStudents: totalDropoutStudents,
+                inscriptions: totalInscriptions,
+                activeCourses: activeCourses.length,
+                upcomingExams: upcomingExams.length
+            });
+        }
+
+        // Get active courses
+        function getActiveCourses() {
+            const today = new Date();
+            return courses.filter(course => {
+                const endDate = new Date(course.endDate);
+                return endDate > today;
+            });
+        }
+
+        // Get upcoming exams
+        function getUpcomingExams() {
+            const today = new Date();
+            const upcomingDays = 10;
+            const futureDate = new Date(today.getTime() + (upcomingDays * 24 * 60 * 60 * 1000));
+            
+            let upcomingExams = [];
+            
+            getActiveCourses().forEach(course => {
+                // Check partial exams
+                if (course.partialExams) {
+                    course.partialExams.forEach(exam => {
+                        const examDate = new Date(exam.date);
+                        if (examDate >= today && examDate <= futureDate) {
+                            upcomingExams.push({
+                                course: course.name,
+                                type: 'Parcial',
+                                date: exam.date,
+                                notifyProfessor: exam.notifyProfessor
+                            });
+                        }
+                    });
+                }
+                
+                // Check final exams
+                if (course.finalExams) {
+                    course.finalExams.forEach(exam => {
+                        const examDate = new Date(exam.date);
+                        if (examDate >= today && examDate <= futureDate) {
+                            upcomingExams.push({
+                                course: course.name,
+                                type: 'Final',
+                                date: exam.date,
+                                notifyProfessor: exam.notifyProfessor
+                            });
+                        }
+                    });
+                }
+                
+                // Check milestones
+                if (course.milestones) {
+                    course.milestones.forEach(milestone => {
+                        const milestoneDate = new Date(milestone.date);
+                        if (milestoneDate >= today && milestoneDate <= futureDate) {
+                            upcomingExams.push({
+                                course: course.name,
+                                type: 'Hito',
+                                date: milestone.date,
+                                detail: milestone.detail,
+                                notifyProfessor: milestone.notifyProfessor
+                            });
+                        }
+                    });
+                }
+            });
+            
+            return upcomingExams.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+
+        // Update alerts
+        function updateAlerts(upcomingExams) {
+            const alertsContainer = document.getElementById('alerts-container');
+            
+            if (upcomingExams.length === 0) {
+                alertsContainer.innerHTML = '<p class="text-gray-500">No hay alertas pendientes</p>';
+                return;
+            }
+            
+            let alertsHTML = '';
+            upcomingExams.forEach(exam => {
+                const daysUntil = Math.ceil((new Date(exam.date) - new Date()) / (1000 * 60 * 60 * 24));
+                const alertClass = daysUntil <= 3 ? 'alert-danger' : 'alert-success';
+                
+                alertsHTML += `
+                    <div class="alert ${alertClass}">
+                        <strong>${exam.course}</strong> - ${exam.type}
+                        ${exam.detail ? ': ' + exam.detail : ''}
+                        <br>
+                        <small>Fecha: ${formatDate(exam.date)} (${daysUntil} días restantes)</small>
+                        ${exam.notifyProfessor ? '<i class="fas fa-bell text-yellow-500 ml-2" title="Notificar al profesor"></i>' : ''}
+                    </div>
+                `;
+            });
+            
+            alertsContainer.innerHTML = alertsHTML;
+        }
+
+        // Course Management Functions
+        function openCourseModal(courseId = null) {
+            console.log('Opening course modal, courseId:', courseId);
+            currentEditingCourse = courseId;
+            
+            const modal = document.getElementById('course-modal');
+            const title = document.getElementById('course-modal-title');
+            
+            if (courseId) {
+                title.textContent = 'Editar Curso';
+                loadCourseData(courseId);
+            } else {
+                title.textContent = 'Nuevo Curso';
+                clearCourseForm();
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeCourseModal() {
+            console.log('Closing course modal');
+            document.getElementById('course-modal').classList.remove('show');
+            currentEditingCourse = null;
+        }
+
+        function clearCourseForm() {
+            console.log('Clearing course form');
+            document.getElementById('course-form').reset();
+            document.getElementById('course-id').value = '';
+            
+            // Clear dynamic fields
+            document.getElementById('partial-exams-container').innerHTML = '';
+            document.getElementById('final-exams-container').innerHTML = '';
+            document.getElementById('milestones-container').innerHTML = '';
+            document.getElementById('students-dropouts-list').innerHTML = '';
+            
+            // Reset student counters
+            document.getElementById('course-initial-students').value = '';
+            document.getElementById('course-dropout-students').value = '0';
+            document.getElementById('course-active-students').value = '0';
+        }
+
+        function loadCourseData(courseId) {
+            console.log('Loading course data for ID:', courseId);
+            const course = courses.find(c => c.id === courseId);
+            if (!course) {
+                console.error('Course not found:', courseId);
+                return;
+            }
+            
+            // Load basic information
+            document.getElementById('course-id').value = course.id;
+            document.getElementById('course-name').value = course.name || '';
+            document.getElementById('course-code').value = course.code || '';
+            document.getElementById('course-description').value = course.description || '';
+            document.getElementById('course-start-date').value = course.startDate || '';
+            document.getElementById('course-end-date').value = course.endDate || '';
+            document.getElementById('course-days').value = course.days || '';
+            document.getElementById('course-schedule').value = course.schedule || '';
+            document.getElementById('course-professor').value = course.professor || '';
+            
+            // Load student data
+            document.getElementById('course-initial-students').value = course.initialStudents || '';
+            document.getElementById('course-dropout-students').value = course.dropouts ? course.dropouts.length : 0;
+            calculateActiveStudents();
+            
+            // Load dynamic fields
+            loadPartialExams(course.partialExams || []);
+            loadFinalExams(course.finalExams || []);
+            loadMilestones(course.milestones || []);
+            loadDropoutsList(course.dropouts || []);
+        }
+
+        function loadPartialExams(partialExams) {
+            const container = document.getElementById('partial-exams-container');
+            container.innerHTML = '';
+            
+            partialExams.forEach((exam, index) => {
+                addPartialExam(exam.date, exam.notifyProfessor);
+            });
+        }
+
+        function loadFinalExams(finalExams) {
+            const container = document.getElementById('final-exams-container');
+            container.innerHTML = '';
+            
+            finalExams.forEach((exam, index) => {
+                addFinalExam(exam.date, exam.notifyProfessor);
+            });
+        }
+
+        function loadMilestones(milestones) {
+            const container = document.getElementById('milestones-container');
+            container.innerHTML = '';
+            
+            milestones.forEach((milestone, index) => {
+                addMilestone(milestone.detail, milestone.date, milestone.notifyProfessor);
+            });
+        }
+
+        function loadDropoutsList(dropouts) {
+            const container = document.getElementById('students-dropouts-list');
+            
+            if (dropouts.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '<h4 class="font-semibold mb-2">Lista de Bajas:</h4>';
+            dropouts.forEach((dropout, index) => {
+                html += `
+                    <div class="bg-red-50 p-3 rounded border mb-2">
+                        <strong>${dropout.name}</strong> - Fecha: ${formatDate(dropout.date)}
+                        <br><small>Motivo: ${getDropoutReasonText(dropout.reason)}</small>
+                        ${dropout.observations ? `<br><small>Obs: ${dropout.observations}</small>` : ''}
+                        <button onclick="removeDropout(${index})" class="btn-danger ml-2 text-xs">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Dynamic fields management
+        function addPartialExam(date = '', notifyProfessor = false) {
+            console.log('Adding partial exam');
+            const container = document.getElementById('partial-exams-container');
+            const index = container.children.length;
+            
+            const examDiv = document.createElement('div');
+            examDiv.className = 'dynamic-field';
+            examDiv.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <label class="form-label">Fecha Parcial ${index + 1}</label>
+                        <input type="date" name="partial-exam-date" class="form-input" value="${date}">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="partial-exam-notify" ${notifyProfessor ? 'checked' : ''}>
+                        <label class="ml-2 text-sm">Avisar al profesor</label>
+                    </div>
+                    <button type="button" onclick="removeElement(this.parentElement.parentElement)" class="btn-danger">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(examDiv);
+        }
+
+        function addFinalExam(date = '', notifyProfessor = false) {
+            console.log('Adding final exam');
+            const container = document.getElementById('final-exams-container');
+            const index = container.children.length;
+            
+            const examDiv = document.createElement('div');
+            examDiv.className = 'dynamic-field';
+            examDiv.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <label class="form-label">Fecha Final ${index + 1}</label>
+                        <input type="date" name="final-exam-date" class="form-input" value="${date}">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="final-exam-notify" ${notifyProfessor ? 'checked' : ''}>
+                        <label class="ml-2 text-sm">Avisar al profesor</label>
+                    </div>
+                    <button type="button" onclick="removeElement(this.parentElement.parentElement)" class="btn-danger">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(examDiv);
+        }
+
+        function addMilestone(detail = '', date = '', notifyProfessor = false) {
+            console.log('Adding milestone');
+            const container = document.getElementById('milestones-container');
+            const index = container.children.length;
+            
+            const milestoneDiv = document.createElement('div');
+            milestoneDiv.className = 'dynamic-field';
+            milestoneDiv.innerHTML = `
+                <div class="grid grid-cols-2 gap-3 items-end">
+                    <div>
+                        <label class="form-label">Detalle del Hito ${index + 1}</label>
+                        <input type="text" name="milestone-detail" class="form-input" placeholder="Descripción del hito" value="${detail}">
+                    </div>
+                    <div>
+                        <label class="form-label">Fecha de Cumplimiento</label>
+                        <input type="date" name="milestone-date" class="form-input" value="${date}">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="milestone-notify" ${notifyProfessor ? 'checked' : ''}>
+                        <label class="ml-2 text-sm">Avisar al profesor</label>
+                    </div>
+                    <div>
+                        <button type="button" onclick="removeElement(this.parentElement.parentElement)" class="btn-danger">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(milestoneDiv);
+        }
+
+        function removeElement(element) {
+            console.log('Removing dynamic element');
+            element.remove();
+            if (currentEditingCourse) {
+                calculateActiveStudents();
+            }
+        }
+
+        // Student management functions
+        function calculateActiveStudents() {
+            const initialStudents = parseInt(document.getElementById('course-initial-students').value) || 0;
+            const dropoutStudents = parseInt(document.getElementById('course-dropout-students').value) || 0;
+            const activeStudents = Math.max(0, initialStudents - dropoutStudents);
+            
+            document.getElementById('course-active-students').value = activeStudents;
+            console.log('Calculated active students:', activeStudents);
+        }
+
+        function openDropoutModal() {
+            console.log('Opening dropout modal');
+            document.getElementById('dropout-modal').classList.add('show');
+        }
+
+        function closeDropoutModal() {
+            console.log('Closing dropout modal');
+            document.getElementById('dropout-modal').classList.remove('show');
+            document.getElementById('dropout-form').reset();
+        }
+
+        function removeDropout(index) {
+            if (!currentEditingCourse) return;
+            
+            const course = courses.find(c => c.id === currentEditingCourse);
+            if (course && course.dropouts) {
+                course.dropouts.splice(index, 1);
+                document.getElementById('course-dropout-students').value = course.dropouts.length;
+                calculateActiveStudents();
+                loadDropoutsList(course.dropouts);
+                saveData();
+            }
+        }
+
+        // Form submission handlers
+        document.getElementById('course-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Submitting course form');
+            
+            const courseData = {
+                id: document.getElementById('course-id').value || generateId(),
+                name: document.getElementById('course-name').value,
+                code: document.getElementById('course-code').value,
+                description: document.getElementById('course-description').value,
+                startDate: document.getElementById('course-start-date').value,
+                endDate: document.getElementById('course-end-date').value,
+                days: document.getElementById('course-days').value,
+                schedule: document.getElementById('course-schedule').value,
+                professor: document.getElementById('course-professor').value,
+                initialStudents: document.getElementById('course-initial-students').value,
+                partialExams: collectPartialExams(),
+                finalExams: collectFinalExams(),
+                milestones: collectMilestones(),
+                dropouts: currentEditingCourse ? (courses.find(c => c.id === currentEditingCourse)?.dropouts || []) : [],
+                createdAt: new Date().toISOString()
+            };
+            
+            if (currentEditingCourse) {
+                const index = courses.findIndex(c => c.id === currentEditingCourse);
+                if (index !== -1) {
+                    courses[index] = { ...courses[index], ...courseData };
+                    console.log('Course updated:', courseData);
+                }
+            } else {
+                courses.push(courseData);
+                console.log('Course created:', courseData);
+            }
+            
+            saveData();
+            renderCourses();
+            updateDashboard();
+            closeCourseModal();
+            
+            alert('Curso guardado correctamente');
+        });
+
+        document.getElementById('dropout-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Submitting dropout form');
+            
+            if (!currentEditingCourse) {
+                alert('Debe estar editando un curso para agregar bajas');
+                return;
+            }
+            
+            const dropoutData = {
+                name: document.getElementById('dropout-student-name').value,
+                date: document.getElementById('dropout-date').value,
+                reason: document.getElementById('dropout-reason').value,
+                observations: document.getElementById('dropout-observations').value
+            };
+            
+            const course = courses.find(c => c.id === currentEditingCourse);
+            if (course) {
+                if (!course.dropouts) course.dropouts = [];
+                course.dropouts.push(dropoutData);
+                
+                document.getElementById('course-dropout-students').value = course.dropouts.length;
+                calculateActiveStudents();
+                loadDropoutsList(course.dropouts);
+                saveData();
+            }
+            
+            closeDropoutModal();
+            alert('Baja registrada correctamente');
+        });
+
+        function collectPartialExams() {
+            const container = document.getElementById('partial-exams-container');
+            const exams = [];
+            
+            container.querySelectorAll('.dynamic-field').forEach(field => {
+                const date = field.querySelector('input[name="partial-exam-date"]').value;
+                const notifyProfessor = field.querySelector('input[name="partial-exam-notify"]').checked;
+                
+                if (date) {
+                    exams.push({ date, notifyProfessor });
+                }
+            });
+            
+            return exams;
+        }
+
+        function collectFinalExams() {
+            const container = document.getElementById('final-exams-container');
+            const exams = [];
+            
+            container.querySelectorAll('.dynamic-field').forEach(field => {
+                const date = field.querySelector('input[name="final-exam-date"]').value;
+                const notifyProfessor = field.querySelector('input[name="final-exam-notify"]').checked;
+                
+                if (date) {
+                    exams.push({ date, notifyProfessor });
+                }
+            });
+            
+            return exams;
+        }
+
+        function collectMilestones() {
+            const container = document.getElementById('milestones-container');
+            const milestones = [];
+            
+            container.querySelectorAll('.dynamic-field').forEach(field => {
+                const detail = field.querySelector('input[name="milestone-detail"]').value;
+                const date = field.querySelector('input[name="milestone-date"]').value;
+                const notifyProfessor = field.querySelector('input[name="milestone-notify"]').checked;
+                
+                if (detail && date) {
+                    milestones.push({ detail, date, notifyProfessor });
+                }
+            });
+            
+            return milestones;
+        }
+
+        // Render functions
+        function renderCourses() {
+            console.log('Rendering courses...');
+            const container = document.getElementById('courses-list');
+            
+            if (courses.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No hay cursos registrados</p>';
+                return;
+            }
+            
+            let html = '';
+            courses.forEach(course => {
+                const professor = professors.find(p => p.id === course.professor);
+                const professorName = professor ? `${professor.name} ${professor.lastname}` : 'Sin asignar';
+                const isActive = new Date(course.endDate) > new Date();
+                const initialStudents = parseInt(course.initialStudents) || 0;
+                const dropouts = course.dropouts ? course.dropouts.length : 0;
+                const activeStudents = initialStudents - dropouts;
+                
+                html += `
+                    <div class="course-card">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold">${course.name}</h3>
+                                <p class="text-gray-600">${course.code || 'Sin código'}</p>
+                                <p class="text-sm text-gray-500 mt-1">${course.description || 'Sin descripción'}</p>
+                                <div class="mt-2 text-sm">
+                                    <span class="inline-block bg-gray-100 px-2 py-1 rounded mr-2">
+                                        <i class="fas fa-user-tie"></i> ${professorName}
+                                    </span>
+                                    <span class="inline-block bg-gray-100 px-2 py-1 rounded mr-2">
+                                        <i class="fas fa-calendar"></i> ${formatDate(course.startDate)} - ${formatDate(course.endDate)}
+                                    </span>
+                                    <span class="inline-block bg-gray-100 px-2 py-1 rounded mr-2">
+                                        <i class="fas fa-clock"></i> ${course.days} ${course.schedule}
+                                    </span>
+                                    <span class="inline-block ${isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'} px-2 py-1 rounded">
+                                        ${isActive ? 'Activo' : 'Finalizado'}
+                                    </span>
+                                </div>
+                                <div class="mt-2 text-sm">
+                                    <span class="text-blue-600 mr-3">Iniciales: ${initialStudents}</span>
+                                    <span class="text-red-600 mr-3">Bajas: ${dropouts}</span>
+                                    <span class="text-green-600">Activos: ${activeStudents}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openCourseModal('${course.id}')" class="btn-secondary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button onclick="deleteCourse('${course.id}')" class="btn-danger">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function deleteCourse(courseId) {
+            if (confirm('¿Está seguro de que desea eliminar este curso?')) {
+                console.log('Deleting course:', courseId);
+                courses = courses.filter(c => c.id !== courseId);
+                saveData();
+                renderCourses();
+                updateDashboard();
+                alert('Curso eliminado correctamente');
+            }
+        }
+
+        // Professor management
+        function openProfessorModal(professorId = null) {
+            console.log('Opening professor modal, professorId:', professorId);
+            currentEditingProfessor = professorId;
+            
+            const modal = document.getElementById('professor-modal');
+            const title = document.getElementById('professor-modal-title');
+            
+            if (professorId) {
+                title.textContent = 'Editar Profesor';
+                loadProfessorData(professorId);
+            } else {
+                title.textContent = 'Nuevo Profesor';
+                document.getElementById('professor-form').reset();
+                document.getElementById('professor-id').value = '';
+                document.getElementById('professor-status').value = 'active';
+                document.getElementById('professor-start-date').value = new Date().toISOString().split('T')[0];
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeProfessorModal() {
+            console.log('Closing professor modal');
+            document.getElementById('professor-modal').classList.remove('show');
+            currentEditingProfessor = null;
+        }
+
+        function loadProfessorData(professorId) {
+            const professor = professors.find(p => p.id === professorId);
+            if (!professor) return;
+            
+            document.getElementById('professor-id').value = professor.id;
+            document.getElementById('professor-name').value = professor.name || '';
+            document.getElementById('professor-lastname').value = professor.lastname || '';
+            document.getElementById('professor-email').value = professor.email || '';
+            document.getElementById('professor-phone').value = professor.phone || '';
+            document.getElementById('professor-specialty').value = professor.specialty || '';
+            document.getElementById('professor-status').value = professor.status || 'active';
+            document.getElementById('professor-start-date').value = professor.startDate || '';
+        }
+
+        document.getElementById('professor-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Submitting professor form');
+            
+            const professorData = {
+                id: document.getElementById('professor-id').value || generateId(),
+                name: document.getElementById('professor-name').value,
+                lastname: document.getElementById('professor-lastname').value,
+                email: document.getElementById('professor-email').value,
+                phone: document.getElementById('professor-phone').value,
+                specialty: document.getElementById('professor-specialty').value,
+                status: document.getElementById('professor-status').value,
+                startDate: document.getElementById('professor-start-date').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (currentEditingProfessor) {
+                const index = professors.findIndex(p => p.id === currentEditingProfessor);
+                if (index !== -1) {
+                    professors[index] = { ...professors[index], ...professorData };
+                }
+            } else {
+                professors.push(professorData);
+            }
+            
+            saveData();
+            renderProfessors();
+            populateProfessorsSelect();
+            closeProfessorModal();
+            
+            alert('Profesor guardado correctamente');
+        });
+
+        function renderProfessors() {
+            console.log('Rendering professors...');
+            const container = document.getElementById('professors-list');
+            
+            if (professors.length === 0) {
+                container.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-gray-500">No hay profesores registrados</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            professors.forEach(professor => {
+                const statusClass = professor.status === 'active' ? 'text-green-600' : 'text-red-600';
+                const statusText = professor.status === 'active' ? 'Activo' : 'Inactivo';
+                
+                html += `
+                    <tr class="border-b">
+                        <td class="py-3">${professor.name} ${professor.lastname}</td>
+                        <td class="py-3">${professor.specialty}</td>
+                        <td class="py-3">${professor.email}</td>
+                        <td class="py-3">
+                            <span class="${statusClass} font-semibold">${statusText}</span>
+                        </td>
+                        <td class="py-3">
+                            <button onclick="openProfessorModal('${professor.id}')" class="btn-secondary mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteProfessor('${professor.id}')" class="btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function deleteProfessor(professorId) {
+            if (confirm('¿Está seguro de que desea eliminar este profesor?')) {
+                console.log('Deleting professor:', professorId);
+                professors = professors.filter(p => p.id !== professorId);
+                saveData();
+                renderProfessors();
+                populateProfessorsSelect();
+                alert('Profesor eliminado correctamente');
+            }
+        }
+
+        function populateProfessorsSelect() {
+            const selects = ['course-professor'];
+            const activeProfessors = professors.filter(p => p.status === 'active');
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    const currentValue = select.value;
+                    select.innerHTML = '<option value="">Seleccionar profesor</option>';
+                    
+                    activeProfessors.forEach(professor => {
+                        const option = document.createElement('option');
+                        option.value = professor.id;
+                        option.textContent = `${professor.name} ${professor.lastname} - ${professor.specialty}`;
+                        select.appendChild(option);
+                    });
+                    
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        // Student management
+        function openStudentModal(studentId = null) {
+            console.log('Opening student modal, studentId:', studentId);
+            currentEditingStudent = studentId;
+            
+            const modal = document.getElementById('student-modal');
+            const title = document.getElementById('student-modal-title');
+            
+            if (studentId) {
+                title.textContent = 'Editar Alumno';
+                loadStudentData(studentId);
+            } else {
+                title.textContent = 'Nuevo Alumno';
+                document.getElementById('student-form').reset();
+                document.getElementById('student-id').value = '';
+                document.getElementById('student-status').value = 'active';
+                document.getElementById('student-enrollment-date').value = new Date().toISOString().split('T')[0];
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeStudentModal() {
+            console.log('Closing student modal');
+            document.getElementById('student-modal').classList.remove('show');
+            currentEditingStudent = null;
+        }
+
+        function loadStudentData(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            document.getElementById('student-id').value = student.id;
+            document.getElementById('student-name').value = student.name || '';
+            document.getElementById('student-lastname').value = student.lastname || '';
+            document.getElementById('student-dni').value = student.dni || '';
+            document.getElementById('student-email').value = student.email || '';
+            document.getElementById('student-phone').value = student.phone || '';
+            document.getElementById('student-course').value = student.course || '';
+            document.getElementById('student-status').value = student.status || 'active';
+            document.getElementById('student-enrollment-date').value = student.enrollmentDate || '';
+        }
+
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Submitting student form');
+            
+            const studentData = {
+                id: document.getElementById('student-id').value || generateId(),
+                name: document.getElementById('student-name').value,
+                lastname: document.getElementById('student-lastname').value,
+                dni: document.getElementById('student-dni').value,
+                email: document.getElementById('student-email').value,
+                phone: document.getElementById('student-phone').value,
+                course: document.getElementById('student-course').value,
+                status: document.getElementById('student-status').value,
+                enrollmentDate: document.getElementById('student-enrollment-date').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (currentEditingStudent) {
+                const index = students.findIndex(s => s.id === currentEditingStudent);
+                if (index !== -1) {
+                    students[index] = { ...students[index], ...studentData };
+                }
+            } else {
+                students.push(studentData);
+            }
+            
+            saveData();
+            renderStudents();
+            populateCoursesSelect();
+            closeStudentModal();
+            
+            alert('Alumno guardado correctamente');
+        });
+
+        function renderStudents() {
+            console.log('Rendering students...');
+            const container = document.getElementById('students-list');
+            
+            if (students.length === 0) {
+                container.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500">No hay alumnos registrados</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            students.forEach(student => {
+                const course = courses.find(c => c.id === student.course);
+                const courseName = course ? course.name : 'Sin asignar';
+                const statusClass = student.status === 'active' ? 'text-green-600' : 'text-red-600';
+                const statusText = student.status === 'active' ? 'Activo' : 'Baja';
+                
+                html += `
+                    <tr class="border-b">
+                        <td class="py-3">${student.name} ${student.lastname}</td>
+                        <td class="py-3">${student.dni}</td>
+                        <td class="py-3">${student.email || '-'}</td>
+                        <td class="py-3">${courseName}</td>
+                        <td class="py-3">
+                            <span class="${statusClass} font-semibold">${statusText}</span>
+                        </td>
+                        <td class="py-3">
+                            <button onclick="openStudentModal('${student.id}')" class="btn-secondary mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteStudent('${student.id}')" class="btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function deleteStudent(studentId) {
+            if (confirm('¿Está seguro de que desea eliminar este alumno?')) {
+                console.log('Deleting student:', studentId);
+                students = students.filter(s => s.id !== studentId);
+                saveData();
+                renderStudents();
+                alert('Alumno eliminado correctamente');
+            }
+        }
+
+        function populateCoursesSelect() {
+            const selects = ['student-course'];
+            const activeCourses = getActiveCourses();
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    const currentValue = select.value;
+                    select.innerHTML = '<option value="">Seleccionar curso</option>';
+                    
+                    activeCourses.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.id;
+                        option.textContent = course.name;
+                        select.appendChild(option);
+                    });
+                    
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        // Calendar functions
+        function renderCalendar() {
+            console.log('Rendering calendar for', currentDate.getFullYear(), currentDate.getMonth());
+            
+            const titleElement = document.getElementById('calendar-title');
+            const gridElement = document.getElementById('calendar-grid');
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            titleElement.textContent = `${getMonthName(month)} ${year}`;
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+            
+            // Clear grid
+            gridElement.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            dayHeaders.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day font-semibold text-center bg-gray-200';
+                dayHeader.textContent = day;
+                gridElement.appendChild(dayHeader);
+            });
+            
+            // Add days
+            const currentDateObj = new Date(startDate);
+            for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                const dayNumber = currentDateObj.getDate();
+                const isCurrentMonth = currentDateObj.getMonth() === month;
+                
+                if (!isCurrentMonth) {
+                    dayElement.classList.add('text-gray-300');
+                }
+                
+                dayElement.innerHTML = `<div class="font-semibold">${dayNumber}</div>`;
+                
+                // Add events for this day
+                const events = getEventsForDate(new Date(currentDateObj));
+                events.forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'calendar-event';
+                    eventElement.style.backgroundColor = getEventColor(event.type);
+                    eventElement.textContent = `${event.course} - ${event.type}`;
+                    eventElement.title = `${event.course} - ${event.type}${event.detail ? ': ' + event.detail : ''}`;
+                    dayElement.appendChild(eventElement);
+                });
+                
+                gridElement.appendChild(dayElement);
+                currentDateObj.setDate(currentDateObj.getDate() + 1);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function getEventsForDate(date) {
+            const events = [];
+            const dateString = date.toISOString().split('T')[0];
+            
+            getActiveCourses().forEach(course => {
+                // Check partial exams
+                if (course.partialExams) {
+                    course.partialExams.forEach(exam => {
+                        if (exam.date === dateString) {
+                            events.push({
+                                course: course.name,
+                                type: 'Parcial',
+                                date: exam.date
+                            });
+                        }
+                    });
+                }
+                
+                // Check final exams
+                if (course.finalExams) {
+                    course.finalExams.forEach(exam => {
+                        if (exam.date === dateString) {
+                            events.push({
+                                course: course.name,
+                                type: 'Final',
+                                date: exam.date
+                            });
+                        }
+                    });
+                }
+                
+                // Check milestones
+                if (course.milestones) {
+                    course.milestones.forEach(milestone => {
+                        if (milestone.date === dateString) {
+                            events.push({
+                                course: course.name,
+                                type: 'Hito',
+                                date: milestone.date,
+                                detail: milestone.detail
+                            });
+                        }
+                    });
+                }
+            });
+            
+            return events;
+        }
+
+        function getEventColor(type) {
+            const colors = {
+                'Parcial': '#3b82f6',
+                'Final': '#ef4444',
+                'Hito': '#22c55e'
+            };
+            return colors[type] || '#6b7280';
+        }
+
+        // Charts
+        function initializeCharts() {
+            console.log('Initializing charts...');
+            
+            // Stats Chart
+            const statsCtx = document.getElementById('statsChart');
+            if (statsCtx) {
+                new Chart(statsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Alumnos Activos', 'Alumnos con Baja'],
+                        datasets: [{
+                            data: [0, 0],
+                            backgroundColor: ['#22c55e', '#ef4444'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateReportsCharts() {
+            console.log('Updating reports charts...');
+            
+            // Course Performance Chart
+            const courseCtx = document.getElementById('coursePerformanceChart');
+            if (courseCtx) {
+                const activeCourses = getActiveCourses();
+                const labels = activeCourses.map(c => c.name);
+                const activeData = activeCourses.map(c => {
+                    const initial = parseInt(c.initialStudents) || 0;
+                    const dropouts = c.dropouts ? c.dropouts.length : 0;
+                    return initial - dropouts;
+                });
+                const dropoutData = activeCourses.map(c => c.dropouts ? c.dropouts.length : 0);
+                
+                new Chart(courseCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Activos',
+                                data: activeData,
+                                backgroundColor: '#22c55e'
+                            },
+                            {
+                                label: 'Bajas',
+                                data: dropoutData,
+                                backgroundColor: '#ef4444'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Utility functions
+        function generateId() {
+            return 'id_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        function getMonthName(monthIndex) {
+            const months = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            return months[monthIndex];
+        }
+
+        function getDropoutReasonText(reason) {
+            const reasons = {
+                'personal': 'Motivos personales',
+                'economic': 'Motivos económicos',
+                'academic': 'Rendimiento académico',
+                'schedule': 'Incompatibilidad horaria',
+                'other': 'Otros'
+            };
+            return reasons[reason] || reason;
+        }
+
+        function filterCourses() {
+            const searchTerm = document.getElementById('course-search').value.toLowerCase();
+            const professorFilter = document.getElementById('professor-filter').value;
+            
+            const filteredCourses = courses.filter(course => {
+                const matchesSearch = course.name.toLowerCase().includes(searchTerm) ||
+                                    (course.code && course.code.toLowerCase().includes(searchTerm)) ||
+                                    (course.description && course.description.toLowerCase().includes(searchTerm));
+                
+                const matchesProfessor = !professorFilter || course.professor === professorFilter;
+                
+                return matchesSearch && matchesProfessor;
+            });
+            
+            // Render filtered courses (simplified for this version)
+            console.log('Filtering courses:', filteredCourses.length, 'of', courses.length);
+        }
+
+        function showStudentsList() {
+            if (!currentEditingCourse) return;
+            
+            const course = courses.find(c => c.id === currentEditingCourse);
+            if (!course) return;
+            
+            const initialStudents = parseInt(course.initialStudents) || 0;
+            const dropouts = course.dropouts ? course.dropouts.length : 0;
+            const activeStudents = initialStudents - dropouts;
+            
+            alert(`Resumen de estudiantes del curso:\n\nEstudiantes iniciales: ${initialStudents}\nBajas: ${dropouts}\nActivos: ${activeStudents}`);
+        }
+
+        // Additional sample data for testing
+        function loadSampleData() {
+            if (courses.length === 0 && professors.length === 0) {
+                console.log('Loading sample data...');
+                
+                // Sample professors
+                professors.push({
+                    id: 'prof_1',
+                    name: 'Juan',
+                    lastname: 'Pérez',
+                    email: 'juan.perez@email.com',
+                    phone: '123456789',
+                    specialty: 'Aire Acondicionado',
+                    status: 'active',
+                    startDate: '2025-01-01',
+                    createdAt: new Date().toISOString()
+                });
+                
+                // Sample course
+                courses.push({
+                    id: 'course_1',
+                    name: 'AIRE ACONDICIONADO SEP MAR 18HS',
+                    code: 'AC001',
+                    description: 'Curso de reparación y mantenimiento de equipos de aire acondicionado',
+                    startDate: '2025-09-01',
+                    endDate: '2025-11-30',
+                    days: 'MARTES',
+                    schedule: '18-20',
+                    professor: 'prof_1',
+                    initialStudents: '25',
+                    partialExams: [
+                        { date: '2025-09-15', notifyProfessor: true },
+                        { date: '2025-10-15', notifyProfessor: true }
+                    ],
+                    finalExams: [
+                        { date: '2025-11-25', notifyProfessor: true }
+                    ],
+                    milestones: [
+                        { detail: 'Evaluación práctica', date: '2025-10-01', notifyProfessor: false }
+                    ],
+                    dropouts: [
+                        { name: 'Carlos López', date: '2025-09-10', reason: 'personal', observations: 'Problemas familiares' }
+                    ],
+                    createdAt: new Date().toISOString()
+                });
+                
+                saveData();
+                initializeApp();
+            }
+        }
+
+        // Load sample data on first run
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                loadSampleData();
+            }, 1000);
+        });
+
+        console.log('Dashboard script loaded successfully');
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDojQzZvbbAQ%2BGNJBHgGBjgGsNFWEQcDSpYmwjRs6Lng83cSu7ioxAt5wQdJTC0lSJfj9rnYSBnzsNswyparmdyt67cKgrrWhfFL7sK2SpIX611YRdcNmFfFasis3epkMkBhEwByVgiEt7ChTecZXnKq3iugW8r6mzG71F4eMdGu0zQxkddT6ljiiVrXPolF0GnAmMAg%2FR0%2BXDX9u7vL%2BsNi4YC6agVSBwVH07dW7WKUNPB1BK592O8J6uNxsvA%2BWAzxm1bQSoqph7fkHkCytszp%2F5CORHfpcKrvYqwFMLvQQYF3TWhnd497C9Wp7JzxBxgjTARtIKMuP6LO8bS%2FbmQEgUUPKtqpqpZsklUBMmTv%2F5DNtLzeip2%2Fq4fJ5FY4N%2BYvOuFiCz9E2PrprFQtinZhr2uDUlDZBdD5%2BrkA4oJCK7XfGzma2C%2FP238bQQXtN5t6KnouuQN6iPdylnPHMS8NeySr%2BUOWiGaRoN2fnK9BCLPzEzPLiPH0m30vIAqFxa8GYywTqjxeG3IvykqSXw2w%3D";
+        window.__genspark_locale = "es-ES";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDojQzZvbbAQ+GNJBHgGBjgGsNFWEQcDSpYmwjRs6Lng83cSu7ioxAt5wQdJTC0lSJfj9rnYSBnzsNswyparmdyt67cKgrrWhfFL7sK2SpIX611YRdcNmFfFasis3epkMkBhEwByVgiEt7ChTecZXnKq3iugW8r6mzG71F4eMdGu0zQxkddT6ljiiVrXPolF0GnAmMAg/R0+XDX9u7vL+sNi4YC6agVSBwVH07dW7WKUNPB1BK592O8J6uNxsvA+WAzxm1bQSoqph7fkHkCytszp/5CORHfpcKrvYqwFMLvQQYF3TWhnd497C9Wp7JzxBxgjTARtIKMuP6LO8bS/bmQEgUUPKtqpqpZsklUBMmTv/5DNtLzeip2/q4fJ5FY4N+YvOuFiCz9E2PrprFQtinZhr2uDUlDZBdD5+rkA4oJCK7XfGzma2C/P238bQQXtN5t6KnouuQN6iPdylnPHMS8NeySr+UOWiGaRoN2fnK9BCLPzEzPLiPH0m30vIAqFxa8GYywTqjxeG3IvykqSXw2w=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
